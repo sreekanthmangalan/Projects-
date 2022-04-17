@@ -1,0 +1,33 @@
+import requests
+url = 'https://www.imdb.com/chart/top'
+response = requests.get(url)
+
+from bs4 import BeautifulSoup
+soup = BeautifulSoup(response.text)
+soup.prettify
+
+data = soup.find_all('td',{'class':'titleColumn'})
+names = []
+links = []
+casts = []
+release_year = []
+for tile in data:
+  name=tile.find('a').text
+  names.append(name)
+  link='www.imdb.com'+tile.find('a')['href']
+  links.append(link)
+  cast = tile.find('a')['title']
+  casts.append(cast)
+  yearOfRelease = tile.find('span').text
+  release_year.append(yearOfRelease)
+
+rating_data=  soup.find_all('td',{'class':'imdbRating'})
+ratings = []
+
+for each in rating_data:
+  ratings.append(each.find('strong').text)
+  
+movies = {}
+for name,rating,cast,year,link, in zip(names,ratings,casts,release_year,links):
+  movies[name]= {'rating':rating,'cast':cast,'year':year,'link':link}
+print(movies)    
